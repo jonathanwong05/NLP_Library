@@ -37,100 +37,85 @@ What get stored:
 
 from collections import defaultdict, Counter
 import random as rnd
-import matplotlib.pyplot as plt
-import textstat
-from textblob import TextBlob
-import re
+from preprocessor import load_website
+from preprocessor import clean_text
+from preprocessor import extract_unique_words
+from preprocessor import compute_word_count
+from preprocessor import compute_sentiment
+from preprocessor import compute_readability
+
+# import matplotlib.pyplot as plt
+# import textstat
+# from textblob import TextBlob
+# import re
+# import requests
+# from bs4 import BeautifulSoup
+
 
 class TextLibrary:
 
     def __init__(self):
-        """ Constructor
+        """Constructor
 
         datakey --> (filelabel --> datavalue)
         """
         self.data = defaultdict(dict)
         self.stop_words = set()
 
-    def clean_text(self, text):
-        """
-        Cleans the input text by:
-        - Lowercasing the text
-        - Removing punctuation
-        - Removing extra whitespace
-        - Optionally filtering out stop words
-        :param text: The raw input text to be cleaned
-        :return: The cleaned text
-        """
-        # Remove punctuation
-        text = re.sub(r'[^\w\s]', '', text)
-
-        # Lowercase
-        text = text.lower()
-
-        # Split into words
-        words = text.split()
-
-        # Remove stop words
-        if self.stop_words:
-            words = [word for word in words if word not in self.stop_words]
-
-        # Join words back into single string
-        return ' '.join(words)
-
-    def tokenize_text(self, text):
-        """
-        Tokenizes the input text into a list of words.
-        """
-        return text.split()
-
-    def compute_word_count(self, text):
-        """
-        Computes the frequency of each word in the text.
-        """
-        words = self.tokenize_text(text)
-        return Counter(words)
-
-    def compute_readability(self, text):
-        """
-        Computes readability scores for the text.
-        """
-        return {
-            'flesch_reading_ease': textstat.flesch_reading_ease(text),
-            'gunning_fog': textstat.gunning_fog(text)
-        }
-
-    def compute_sentiment(self, text):
-        """
-        Computes sentiment analysis for the text.
-        """
-        blob = TextBlob(text)
-        return {
-            'polarity': blob.sentiment.polarity,
-            'subjectivity': blob.sentiment.subjectivity
-        }
-
     def default_parser(self, filename):
-        """ Parse a standard text file and produce
-        extract data results in the form of a dictionary. """
+        """Parse a standard text file and produce
+        extract data results in the form of a dictionary."""
 
         results = {
-            'wordcount': Counter("To be or not to be".split(" ")),
-            'numwords' : rnd.randrange(10, 50)
+            "wordcount": Counter("To be or not to be".split(" ")),
+            "numwords": rnd.randrange(10, 50),
         }
+
+        return results
+
+    def website_parser(self, url, div_class):
+        """Gets information on text from a website
+
+        Args:
+            url (string): Website url
+            div_class (string): Div class to find specific text
+
+        Returns:
+            dictionary: dictionary with text information
+        """
+        results = {}
+
+        # Load the text from a website
+        text = load_website(url, div_class)
+
+        # Clean the text
+        text = clean_text(text, self.stop_words)
+
+        # Get word counts
+        word_counts = compute_word_count(text)
+        results["wordcount"] = word_counts
+
+        # Get unique words
+        unique_words = extract_unique_words(text)
+        results["unique words"] = unique_words
+
+        # Get sentiment
+        sentiment = compute_sentiment(text)
+        results.update(sentiment)
+
+        # Get readability
+        readability = compute_readability(text)
+        results.update(readability)
 
         return results
 
     def load_stop_words(self, stopwords_file):
         pass
 
-
-
-
     def load_text(self, filename, label=None, parser=None):
-        """ Register a document with the framework.
+        """Register a document with the framework.
         Extract and store data to be used later by
-        the visualizations """
+        the visualizations"""
         if parser is None:
             results = self.default_parser(filename)
         else:
@@ -141,13 +126,3 @@ class TextLibrary:
 
         for k, v in results.items():
             self.data[k][label] = v
-
-    def compare_num_words(self):
-        """ This is a very simplistic visualization that creates
-        a bar chart comparing number of words.   (Not intended
-        for your project.)  """
-
-        num_words = self.data['numwords']
-        for label, nw in num_words.items():
-            plt.bar(label, nw)
-        plt.show()
