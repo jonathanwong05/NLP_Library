@@ -35,29 +35,27 @@ What get stored:
 
 """
 
-
 from collections import defaultdict, Counter
 import random as rnd
 import matplotlib.pyplot as plt
 
+
 class TextLibrary:
 
     def __init__(self):
-        """ Constructor
+        """Constructor
 
         datakey --> (filelabel --> datavalue)
         """
         self.data = defaultdict(dict)
 
-
-
     def default_parser(self, filename):
-        """ Parse a standard text file and produce
-        extract data results in the form of a dictionary. """
+        """Parse a standard text file and produce
+        extract data results in the form of a dictionary."""
 
         results = {
-            'wordcount': Counter("To be or not to be".split(" ")),
-            'numwords' : rnd.randrange(10, 50)
+            "wordcount": Counter("To be or not to be".split(" ")),
+            "numwords": rnd.randrange(10, 50),
         }
 
         return results
@@ -65,12 +63,10 @@ class TextLibrary:
     def load_stop_words(self, stopwords_file):
         pass
 
-
-
     def load_text(self, filename, label=None, parser=None):
-        """ Register a document with the framework.
+        """Register a document with the framework.
         Extract and store data to be used later by
-        the visualizations """
+        the visualizations"""
         if parser is None:
             results = self.default_parser(filename)
         else:
@@ -83,11 +79,11 @@ class TextLibrary:
             self.data[k][label] = v
 
     def compare_num_words(self):
-        """ This is a very simplistic visualization that creates
+        """This is a very simplistic visualization that creates
         a bar chart comparing number of words.   (Not intended
-        for your project.)  """
+        for your project.)"""
 
-        num_words = self.data['numwords']
+        num_words = self.data["numwords"]
         for label, nw in num_words.items():
             plt.bar(label, nw)
         plt.show()
