@@ -122,13 +122,9 @@ class TextLibrary:
         return results
 
     def load_stop_words(self, stopwords_file):
-        """
-        Load a list of stop words from a file
-        :param stopwords_file: file of stop words
-        :return: A set of stop words
-        """
-        with open(stopwords_file, 'r') as file:
-            self.stop_words = set(file.read().splitlines())
+        pass
+
+
 
 
     def load_text(self, filename, label=None, parser=None):
