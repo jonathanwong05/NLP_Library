@@ -38,6 +38,9 @@ What get stored:
 from collections import defaultdict, Counter
 import random as rnd
 import matplotlib.pyplot as plt
+import textstat
+from textblob import TextBlob
+import re
 
 
 class TextLibrary:
@@ -48,6 +51,65 @@ class TextLibrary:
         datakey --> (filelabel --> datavalue)
         """
         self.data = defaultdict(dict)
+        self.stop_words = set()
+
+    def clean_text(self, text):
+        """
+        Cleans the input text by:
+        - Lowercasing the text
+        - Removing punctuation
+        - Removing extra whitespace
+        - Optionally filtering out stop words
+        :param text: The raw input text to be cleaned
+        :return: The cleaned text
+        """
+        # Remove punctuation
+        text = re.sub(r"[^\w\s]", "", text)
+
+        # Lowercase
+        text = text.lower()
+
+        # Split into words
+        words = text.split()
+
+        # Remove stop words
+        if self.stop_words:
+            words = [word for word in words if word not in self.stop_words]
+
+        # Join words back into single string
+        return " ".join(words)
+
+    def tokenize_text(self, text):
+        """
+        Tokenizes the input text into a list of words.
+        """
+        return text.split()
+
+    def compute_word_count(self, text):
+        """
+        Computes the frequency of each word in the text.
+        """
+        words = self.tokenize_text(text)
+        return Counter(words)
+
+    def compute_readability(self, text):
+        """
+        Computes readability scores for the text.
+        """
+        return {
+            "flesch_reading_ease": textstat.flesch_reading_ease(text),
+            "gunning_fog": textstat.gunning_fog(text),
+        }
+
+    def compute_sentiment(self, text):
+        """
+        Computes sentiment analysis for the text.
+        """
+        blob = TextBlob(text)
+        return {
+            "polarity": blob.sentiment.polarity,
+            "subjectivity": blob.sentiment.subjectivity,
+        }
 
     def default_parser(self, filename):
         """Parse a standard text file and produce
