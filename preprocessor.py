@@ -7,6 +7,15 @@ from bs4 import BeautifulSoup
 
 
 def load_website(url, div_class):
+    """Loads a website's text
+
+    Args:
+        url (string): Url of the website
+        div_class (string): Div class of text
+
+    Returns:
+        string: Text from the website
+    """
     response = requests.get(url)
     if response.status_code == 200:
         soup = BeautifulSoup(response.text, "html.parser")
@@ -15,16 +24,29 @@ def load_website(url, div_class):
     return text
 
 
-def clean_text(text, stop_words=None):
+def load_text(filename):
+    """Load text from a file
+
+    Args:
+        filename (string): Name of the file
+
+    Returns:
+        string: Text of the file
     """
-    Cleans the input text by:
-    - Lowercasing the text
-    - Removing punctuation
-    - Removing extra whitespace
-    - Optionally filtering out stop words
-    :param text: The raw input text to be cleaned
-    :param stop_words: A set of stop words to be removed
-    :return: The cleaned text
+    with open(filename, "r") as file:
+        text = file.read()
+    return text
+
+
+def clean_text(text, stop_words=None):
+    """Cleans the text
+
+    Args:
+        text (string): The text to be cleaned
+        stop_words (set, optional): Set of stop words to remove from text. Defaults to None.
+
+    Returns:
+        string: Cleaned text
     """
     # Remove punctuation
     text = re.sub(r"[^\w\s]", "", text)
@@ -44,29 +66,38 @@ def clean_text(text, stop_words=None):
 
 
 def tokenize_text(text):
-    """
-    Tokenizes the input text into list of words
-    :param text: input text
-    :return: List of words
+    """Tokenizes the input text into list of words
+
+    Args:
+        text (text): Input text
+
+    Returns:
+        list: List of words in text
     """
     return text.split()
 
 
 def compute_word_count(text):
-    """
-    Computes frequency of each word in the text
-    :param text: input text
-    :return: Counter object with word frequencies
+    """Computes frequency of each word in the text
+
+    Args:
+        text (string): Input text
+
+    Returns:
+        dictionary: Frequency of each word in text
     """
     words = tokenize_text(text)
     return Counter(words)
 
 
 def compute_readability(text):
-    """
-    Compute readability scores for the text
-    :param text: input text
-    :return: Dictionary containing readability scores
+    """Compute readability scores for the text
+
+    Args:
+        text (string): Input text
+
+    Returns:
+        dictionary: Readability scores
     """
     return {
         "flesch_reading_ease": textstat.flesch_reading_ease(text),
@@ -75,10 +106,13 @@ def compute_readability(text):
 
 
 def compute_sentiment(text):
-    """
-    Computes sentiment analysis for the text
-    :param text: input text
-    :return: dictionary containing sentiment polarity and subjectivity
+    """Computes sentiment analysis for the text
+
+    Args:
+        text (string): Input text
+
+    Returns:
+        dictionary: Sentiment scores
     """
     blob = TextBlob(text)
     return {
@@ -88,55 +122,13 @@ def compute_sentiment(text):
 
 
 def extract_unique_words(text):
-    """
-    Extracts a set of unique words from the text
-    :param text: input text
-    :return: Set of unique words
+    """Extracts a set of unique words from the text
+
+    Args:
+        text (string): Input text
+
+    Returns:
+        set: Set of unique words
     """
     words = tokenize_text(text)
     return set(words)
-
-
-def website_parser(url, div_class):
-    """Gets information on text from a website
-
-    Args:
-        url (string): Website url
-        div_class (string): Div class to find specific text
-
-    Returns:
-        dictionary: dictionary with text information
-    """
-    results = {}
-
-    # Load the text from a website
-    text = load_website(url, div_class)
-
-    # Clean the text
-    text = clean_text(text)
-
-    # Get word counts
-    word_counts = compute_word_count(text)
-    results["wordcount"] = word_counts
-
-    # Get unique words
-    unique_words = extract_unique_words(text)
-    results["unique words"] = unique_words
-
-    # Get sentiment
-    sentiment = compute_sentiment(text)
-    results.update(sentiment)
-
-    # Get readability
-    readability = compute_readability(text)
-    results.update(readability)
-
-    return results
-
-
-results = website_parser(
-    "https://genius.com/Kanye-west-all-falls-down-lyrics",
-    "Lyrics__Container-sc-1ynbvzw-1 kUgSbL",
-)
-
-print(results)
