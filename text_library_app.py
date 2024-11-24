@@ -6,8 +6,6 @@ Authors: Vichu Selvaraju & Jon Wong
 """
 
 from text_library import TextLibrary
-import pandas as pd
-
 
 lyric_urls = {
     "All Falls Down": "https://genius.com/Kanye-west-all-falls-down-lyrics",
@@ -28,6 +26,7 @@ def main():
     # Set stop words
     tl.load_stop_words(stopwords_file="stop_words.txt")
 
+    # Load in data
     for label, url in lyric_urls.items():
         tl.load_text(
             url=url,
@@ -36,6 +35,7 @@ def main():
             label=label,
         )
 
+    # Sankey diagram
     tl.sankey(5)
 
 
