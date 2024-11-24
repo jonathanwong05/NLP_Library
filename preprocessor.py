@@ -1,3 +1,9 @@
+"""
+File: preprocessor.py
+Description: Preprocessor functions to be used in text_library.py
+Authors: Vichu Selvaraju & Jon Wong
+"""
+
 import re
 from collections import Counter
 import textstat
