@@ -190,11 +190,11 @@ class TextLibrary:
         x_axis = np.arange(0, len(songs) * 2, 2)
 
         # Plots
-        plt.bar(x_axis - 0.3, polarity_scores, 0.6, label="Polarity")
-        plt.bar(x_axis + 0.3, subjectivity_scores, 0.6, label="Subjectivity")
+        plt.bar(x_axis - 0.4, polarity_scores, 0.4, label="Polarity")
+        plt.bar(x_axis + 0.4, subjectivity_scores, 0.4, label="Subjectivity")
 
         # Labels
-        plt.xticks(x_axis, songs)
+        plt.xticks(x_axis, songs, rotation=30, ha="right")
         plt.xlabel("Song Titles", fontsize=10)
         plt.ylabel("Polarity/Subjectivity Scores", fontsize=10)
         plt.title("Subjectivity and Polarity of Kanye's songs")
@@ -239,7 +239,7 @@ class TextLibrary:
                     word_repetitions.get(label, 0),
                 ],
                 color=["purple", "orange"],
-                label=["Unique Words", "Repetition (%)"]
+                label=["Unique Words", "Repetition (%)"],
             )
 
             # Line plot for rhyme density on secondary y-axis
@@ -249,15 +249,19 @@ class TextLibrary:
                 color="cyan",
                 linestyle="--",
                 marker="o",
-                label="Rhyme Density"
+                label="Rhyme Density",
             )
 
             # Titles and labels
             ax.set_title(f"Lyrical Analysis: {label}")
-            ax.set_ylim(0, max(
-                max(unique_words.values(), default=0),
-                max(word_repetitions.values(), default=0)) + 10
-                        )
+            ax.set_ylim(
+                0,
+                max(
+                    max(unique_words.values(), default=0),
+                    max(word_repetitions.values(), default=0),
+                )
+                + 10,
+            )
             ax2.set_ylim(0, max(rhyme_densities.values(), default=0) + 0.1)
 
             ax.set_ylabel("Unique Words / Repetition (%)")

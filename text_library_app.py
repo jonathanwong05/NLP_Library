@@ -17,7 +17,7 @@ lyric_urls = {
     "Saint Pablo (2016)": "https://genius.com/Kanye-west-saint-pablo-lyrics",
     "Ghost Town (2018)": "https://genius.com/Kanye-west-ghost-town-lyrics",
     "Off the Grid (2021)": "https://genius.com/Kanye-west-off-the-grid-lyrics",
-    "Pure Souls (2021)": "https://genius.com/Kanye-west-pure-souls-lyrics"
+    "Pure Souls (2021)": "https://genius.com/Kanye-west-pure-souls-lyrics",
 }
 
 
@@ -40,9 +40,12 @@ def main():
     # Sankey diagram
     tl.sankey(5)
 
+    # Sentiment Graph
     tl.sentiment_graph()
 
+    # Lyric Analysis
     tl.lyrics_analysis_graph()
+
 
 if __name__ == "__main__":
     main()

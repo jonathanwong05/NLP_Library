@@ -101,8 +101,9 @@ def compute_word_count(text):
     words = tokenize_text(text)
     return Counter(words)
 
+
 def compute_rhyme_density(text):
-    """ Computes the density of rhymes in a text
+    """Computes the density of rhymes in a text
 
     Returns:
         float: Rhyme density (number of rhyming words / total words).
@@ -119,6 +120,7 @@ def compute_rhyme_density(text):
 
     # Calculate rhyming density
     return rhyme_count / len(words)
+
 
 def compute_sentiment(text):
     """Computes sentiment analysis for the text
@@ -147,6 +149,7 @@ def extract_unique_words(text):
     """
     words = tokenize_text(text)
     return set(words)
+
 
 def compute_word_repetition(text):
     """
