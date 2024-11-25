@@ -113,12 +113,10 @@ class TextLibrary:
 
         # Get unique words
         unique_words = len(extract_unique_words(fully_cleaned_text))
-        print(f"Unique words: {unique_words}")
         results["unique words"] = unique_words
 
         # Get word repetition
         percent_repeated_words = compute_word_repetition(fully_cleaned_text)
-        print(f"Word repetition: {percent_repeated_words}")
         results["word_repetition"] = percent_repeated_words
 
         # Get sentiment
