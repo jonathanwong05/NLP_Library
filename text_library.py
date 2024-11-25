@@ -8,7 +8,9 @@ custom parsers.)
 Authors: Vichu Selvaraju & Jon Wong
 """
 
+import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 from collections import defaultdict
 from preprocessor import load_text
 from preprocessor import load_website
@@ -156,3 +158,26 @@ class TextLibrary:
 
         df = pd.DataFrame(rows, columns=["Label", "Word", "Count"])
         sk.make_sankey(df, "Label", "Word", vals="Count")
+
+    def sentiment_graph(self):
+        """Graph comapring sentiment analysis"""
+        # Data for plots
+        songs = list(self.data["polarity"].keys())
+        polarity_scores = list(self.data["polarity"].values())
+        subjectivity_scores = list(self.data["subjectivity"].values())
+        x_axis = np.arange(0, len(songs) * 2, 2)
+
+        # Plots
+        plt.bar(x_axis - 0.3, polarity_scores, 0.6, label="Polarity")
+        plt.bar(x_axis + 0.3, subjectivity_scores, 0.6, label="Subjectivity")
+
+        # Labels
+        plt.xticks(x_axis, songs)
+        plt.xlabel("Song Titles", fontsize=10)
+        plt.ylabel("Polarity/Subjectivity Scores", fontsize=10)
+        plt.title("Subjectivity and Polarity of Kanye's songs")
+        plt.axhline(0, color="black", linewidth=1, linestyle="--")
+
+        # Show plot
+        plt.legend()
+        plt.show()
