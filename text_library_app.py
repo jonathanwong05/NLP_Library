@@ -2,7 +2,7 @@
 File: text_library.py
 Description: A breakdown of Kanye West's biggest hits
 
-Authors: Vichu Selvaraju & Jon Wong
+Authors: Vichu Selvaraju, Jon Wong, & Ian Menachery
 """
 
 from text_library import TextLibrary
@@ -26,7 +26,11 @@ def main():
     tl = TextLibrary()
 
     # Set stop words
-    tl.load_stop_words(stopwords_file="stop_words.txt")
+    try:
+        tl.load_stop_words(stopwords_file="stop_words.txt")
+        print("Stop words loaded successfully!")
+    except Exception as e:
+        print(f"Error: Could not load stop words. {e}")
 
     # Load in data
     for label, url in lyric_urls.items():
