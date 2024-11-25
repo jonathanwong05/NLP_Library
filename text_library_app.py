@@ -42,7 +42,7 @@ def main():
 
     tl.sentiment_graph()
 
-    tl.readability_graph()
+    tl.lyrics_analysis_graph()
 
 if __name__ == "__main__":
     main()

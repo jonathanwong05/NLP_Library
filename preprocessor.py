@@ -11,6 +11,7 @@ import textstat
 from textblob import TextBlob
 import requests
 from bs4 import BeautifulSoup
+import pronouncing
 
 
 def load_website(url, div_class):
@@ -45,7 +46,7 @@ def load_text(filename):
     return text
 
 
-def clean_text(text, stop_words=None):
+def clean_text(text, stop_words=None, preserve_punctuation=False):
     """Cleans the text
 
     Args:
@@ -55,8 +56,12 @@ def clean_text(text, stop_words=None):
     Returns:
         string: Cleaned text
     """
-    # Remove punctuation
-    text = re.sub(r"[^\w\s]", "", text)
+    if not preserve_punctuation:
+        # Remove punctuation
+        text = re.sub(r"[^\w\s]", "", text)
+    else:
+        # Remove all punctuation except sentence-ending punctuation
+        text = re.sub(r"[^\w\s.!?]", "", text)
 
     # Lowercase
     text = text.lower()
@@ -96,21 +101,24 @@ def compute_word_count(text):
     words = tokenize_text(text)
     return Counter(words)
 
-
-def compute_readability(text):
-    """Compute readability scores for the text
-
-    Args:
-        text (string): Input text
+def compute_rhyme_density(text):
+    """ Computes the density of rhymes in a text
 
     Returns:
-        dictionary: Readability scores
+        float: Rhyme density (number of rhyming words / total words).
     """
-    return {
-        "flesch_reading_ease": textstat.flesch_reading_ease(text),
-        "gunning_fog": textstat.gunning_fog(text),
-    }
+    words = text.split()
 
+    # Find rhymes for each word
+    rhymes = set()
+    for word in words:
+        rhymes.update(pronouncing.rhymes(word.lower()))  # Ensure lowercase for matching
+
+    # Count rhyming words
+    rhyme_count = sum(1 for word in words if word in rhymes)
+
+    # Calculate rhyming density
+    return rhyme_count / len(words)
 
 def compute_sentiment(text):
     """Computes sentiment analysis for the text
@@ -139,3 +147,18 @@ def extract_unique_words(text):
     """
     words = tokenize_text(text)
     return set(words)
+
+def compute_word_repetition(text):
+    """
+    Computes the percentage of repeated words in a text.
+
+    Args:
+        text (string): Input text.
+
+    Returns:
+        float: Percentage of repeated words.
+    """
+    words = text.split()
+    word_counts = Counter(words)
+    repeated_words = sum(count - 1 for count in word_counts.values() if count > 1)
+    return repeated_words / len(words) * 100
