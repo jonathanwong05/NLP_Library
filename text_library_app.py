@@ -38,7 +38,7 @@ def main():
         )
 
     # Sankey diagram
-    # tl.sankey(5)
+    tl.sankey(5)
 
     tl.sentiment_graph()
 

@@ -209,3 +209,7 @@ class TextLibrary:
                 ax.set_title(label)
                 ax.set_ylabel("Score")
                 ax.set_ylim(0, 100)
+
+        # Adjust layout and display
+        plt.tight_layout()
+        plt.show()
