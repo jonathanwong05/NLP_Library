@@ -5,7 +5,7 @@ In theory, the framework should support any collection of texts
 of interest (though this might require the implementation of some
 custom parsers.)
 
-Authors: Vichu Selvaraju & Jon Wong
+Authors: Vichu Selvaraju, Jon Wong & Ian Menachery
 """
 
 import numpy as np
