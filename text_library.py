@@ -11,6 +11,7 @@ Authors: Vichu Selvaraju, Jon Wong & Ian Menachery
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from sklearn.preprocessing import MinMaxScaler
 from collections import defaultdict
 from preprocessor import load_text
 from preprocessor import load_website
@@ -180,39 +181,80 @@ class TextLibrary:
         sk.make_sankey(df, "Label", "Word", vals="Count")
 
     def sentiment_graph(self):
-        """Graph comparing sentiment analysis"""
+        """Graph comparing normalized sentiment analysis"""
+
         # Data for plots
         songs = list(self.data["polarity"].keys())
-        polarity_scores = list(self.data["polarity"].values())
-        subjectivity_scores = list(self.data["subjectivity"].values())
+        polarity_scores = np.array(list(self.data["polarity"].values())).reshape(-1, 1)
+        subjectivity_scores = np.array(
+            list(self.data["subjectivity"].values())
+        ).reshape(-1, 1)
+
+        # Normalize data using MinMaxScaler
+        scaler = MinMaxScaler()
+        normalized_polarity = scaler.fit_transform(polarity_scores).flatten()
+        normalized_subjectivity = scaler.fit_transform(subjectivity_scores).flatten()
+
+        # X-axis values
         x_axis = np.arange(0, len(songs) * 2, 2)
 
         # Plots
-        plt.bar(x_axis - 0.4, polarity_scores, 0.4, label="Polarity")
-        plt.bar(x_axis + 0.4, subjectivity_scores, 0.4, label="Subjectivity")
+        plt.bar(
+            x_axis - 0.4,
+            normalized_polarity,
+            0.4,
+            label="Polarity (Normalized)",
+            color="blue",
+        )
+        plt.bar(
+            x_axis + 0.4,
+            normalized_subjectivity,
+            0.4,
+            label="Subjectivity (Normalized)",
+            color="orange",
+        )
 
         # Labels
-        plt.xticks(x_axis, songs, rotation=30, ha="right")
+        plt.xticks(x_axis, songs, rotation=30, ha="right", fontsize=10)
         plt.xlabel("Song Titles", fontsize=10)
-        plt.ylabel("Polarity/Subjectivity Scores", fontsize=10)
-        plt.title("Subjectivity and Polarity of Kanye's songs")
+        plt.ylabel("Normalized Scores", fontsize=10)
+        plt.title("Normalized Subjectivity and Polarity of Songs")
         plt.axhline(0, color="black", linewidth=1, linestyle="--")
 
-        # Show plot
+        # Legend
         plt.legend()
+
+        # Adjust layout and show plot
+        plt.tight_layout()
         plt.show()
 
     def lyrics_analysis_graph(self):
         """
-        Creates subplots with rhyme density information for each song.
+        Creates subplots with normalized rhyme density, unique words,
+        and word repetition data for each song using sklearn MinMaxScaler.
         Subplot dimensions are hardcoded to 3 columns with dynamic rows.
+        The ticks are adjusted to represent normalized data values.
         """
 
         # Data
         labels = list(self.data["rhyme_density"].keys())
         rhyme_densities = self.data["rhyme_density"]
-        unique_words = self.data["unique words"]  # Fix: Ensure correct access
+        unique_words = self.data["unique words"]
         word_repetitions = self.data["word_repetition"]
+
+        # Prepare data for normalization
+        scaler = MinMaxScaler()
+        data = {
+            "rhyme_density": list(rhyme_densities.values()),
+            "unique_words": list(unique_words.values()),
+            "word_repetitions": list(word_repetitions.values()),
+        }
+
+        # Normalize data
+        normalized_data = scaler.fit_transform(np.array(list(data.values())).T)
+        normalized_rhyme_densities = dict(zip(labels, normalized_data[:, 0]))
+        normalized_unique_words = dict(zip(labels, normalized_data[:, 1]))
+        normalized_word_repetitions = dict(zip(labels, normalized_data[:, 2]))
 
         # Subplot dimensions
         cols = 3
@@ -229,46 +271,53 @@ class TextLibrary:
             # Create secondary y-axis for rhyme density
             ax2 = ax.twinx()
 
-            # Bar plot for word repetition and unique words
+            # Bar plot for normalized word repetition and unique words
+            bar_labels = ["Unique Words (Norm.)", "Repetition (%) (Norm.)"]
             ax.bar(
-                ["Unique Words", "Repetition (%)"],
+                bar_labels,
                 [
-                    unique_words.get(label, 0),  # Access unique words correctly
-                    word_repetitions.get(label, 0),
+                    normalized_unique_words.get(label, 0),  # Access normalized data
+                    normalized_word_repetitions.get(label, 0),
                 ],
                 color=["purple", "orange"],
-                label=["Unique Words", "Repetition (%)"],
+                label=bar_labels,
             )
 
-            # Line plot for rhyme density on secondary y-axis
+            # Line plot for normalized rhyme density on secondary y-axis
             ax2.plot(
-                ["Rhyme Density"],
-                [rhyme_densities.get(label, 0)],
+                ["Rhyme Density (Norm.)"],
+                [normalized_rhyme_densities.get(label, 0)],
                 color="cyan",
                 linestyle="--",
                 marker="o",
-                label="Rhyme Density",
+                label="Rhyme Density (Norm.)",
             )
 
             # Titles and labels
             ax.set_title(f"Lyrical Analysis: {label}")
-            ax.set_ylim(
-                0,
-                max(
-                    max(unique_words.values(), default=0),
-                    max(word_repetitions.values(), default=0),
-                )
-                + 10,
-            )
-            ax2.set_ylim(0, max(rhyme_densities.values(), default=0) + 0.1)
+            ax.set_ylim(0, 1)  # Normalized range
+            ax2.set_ylim(0, 1)  # Normalized range
 
-            ax.set_ylabel("Unique Words / Repetition (%)")
-            ax2.set_ylabel("Rhyme Density")
+            ax.set_ylabel("Normalized Unique Words / Repetition (%)")
+            ax2.set_ylabel("Normalized Rhyme Density")
 
             # Add legends for both axes
             ax.legend(loc="upper left")
             ax2.legend(loc="upper right")
 
-        # Adjust layout and display
+            # Adjust x-axis ticks and labels
+            ax.set_xticks(range(len(bar_labels) + 1))
+            ax.set_xticklabels(bar_labels + ["Rhyme Density (Norm.)"])
+
+        # Hide unused subplots if the number of songs is less than rows * cols
+        for j in range(num_files, rows * cols):
+            fig.delaxes(axes[j])
+
+        # Adjust layout and add extra spacing
         plt.tight_layout()
+        plt.subplots_adjust(
+            hspace=0.6, wspace=0.5
+        )  # Adjust vertical and horizontal spacing
+
+        # Display the plot
         plt.show()
